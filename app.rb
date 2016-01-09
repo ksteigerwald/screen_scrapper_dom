@@ -18,5 +18,9 @@ a.get('https://www.dom.com/residential/dominion-virginia-power/sign-in') do |pag
     f.password = pass
   end.click_button
 
-  puts profile_page.to_yaml
+  billing_page = a.click(profile_page.link_with(:text => 'Billing'))
+
+  detailed_energy_usage_page = a.click(profile_page.link_with(text: 'Detailed Energy Usage')) do |p|
+
+  end
 end
