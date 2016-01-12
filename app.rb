@@ -3,24 +3,33 @@
 require 'rubygems'
 require 'mechanize'
 require 'highline'
-
+# Bill information needed includes:
+#   - usage (kWh),
+#   - bill amount ($),
+#   - service start date,
+#   - and service end date (also sometimes referred to as the meter read dates),
+#   bill due date that can be found under "Analyze Energy Usage"
 cli = HighLine.new
 user = cli.ask "Dominion Power User Name:" || ENV['DOM_USER']
 pass = cli.ask "Dominion Power Password:" || ENV['DOM_PASS']
 
-a = Mechanize.new
-a.agent.http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+ajax_headers = { 'X-Requested-With' => 'XMLHttpRequest', 'Content-Type' => 'application/json; charset=utf-8', 'Accept' => 'application/json, text/javascript, */*'}
 
-a.get('https://www.dom.com/residential/dominion-virginia-power/sign-in') do |page|
+agent = Mechanize.new do |a|
+  a.user_agent = (Mechanize::AGENT_ALIASES.keys - ['Mechanize']).sample
+  a.agent.http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+end
 
-  profile_page = page.form_with(:action => '/residential/dominion-virginia-power/sign-in') do |f|
-    f.user = user
-    f.password = pass
-  end.click_button
+agent.agent.http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
-  #billing_page = a.click(profile_page.link_with(:text => 'Billing'))
-  puts profile_page.links.to_yaml
-  detailed_energy_usage_page = a.click(profile_page.link_with(text: 'Detailed Energy Usage')) do |p|
+a.get('https://mya.dom.com/') do |page|
 
-  end
+  login_form.field_with(name: 'USER').value = user || ENV['DOM_USER']
+  login_form.field_with(name: 'PASSWORD').value = password || ENV['DOM_PASS']
+
+  agent.submit(login_form, login_form.buttons.first)
+
+  @profile_page = @a.get('https://mya.dom.com/')
+  @billing_page = @a.get('https://mya.dom.com/billing/ViewBilling', ajax_headers)
+
 end
