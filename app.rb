@@ -9,11 +9,14 @@ require 'highline'
 #   - service start date,
 #   - and service end date (also sometimes referred to as the meter read dates),
 #   bill due date that can be found under "Analyze Energy Usage"
+
 cli = HighLine.new
 user = cli.ask "Dominion Power User Name:" || ENV['DOM_USER']
 pass = cli.ask "Dominion Power Password:" || ENV['DOM_PASS']
 
-ajax_headers = { 'X-Requested-With' => 'XMLHttpRequest', 'Content-Type' => 'application/json; charset=utf-8', 'Accept' => 'application/json, text/javascript, */*'}
+ajax_headers = { 'X-Requested-With' => 'XMLHttpRequest',
+                 'Content-Type' => 'application/json; charset=utf-8',
+                 'Accept' => 'application/json, text/javascript, */*'}
 
 agent = Mechanize.new do |a|
   a.user_agent = (Mechanize::AGENT_ALIASES.keys - ['Mechanize']).sample

@@ -1,5 +1,6 @@
 require 'minitest/autorun'
 require 'mechanize'
+require 'date'
 
 class TestApp < Minitest::Test
   i_suck_and_my_tests_are_order_dependent!
@@ -60,10 +61,10 @@ class TestApp < Minitest::Test
     @energy_usage = @a.get('https://mya.dom.com/usage/ViewPastEnergyUsage', @ajax_headers)
     table = @energy_usage.search('table#paymentsTable')
     assert table.css('tr > th')[0].text == 'Meter Read Date', 'Past Enenergy Usage Page did not load'
-    #nodes = @energy_usage.search("*[text() = 'Next Meter Read Date']")
     nodes = @energy_usage.search("*[text() = 'Next Meter Read Date']")
-    puts nodes.first.parent.parent.to_s
-    puts nodes.first.parent.parent.next
+    dt = nodes.first.parent.parent.next.next.children[1].css('p').text
+    meter_read_date_year = DateTime.parse(dt).year
+    assert meter_read_date_year > 2015, 'date was not read'
   end
 
 
