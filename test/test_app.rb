@@ -47,6 +47,7 @@ class TestApp < Minitest::Test
     if @profile_page.body.include? 'Please try again'
       puts "login failed"
     else
+      puts "login succeded"
       #puts @profile_page.search("*[text() = 'Account Number:']")
     end
   end
@@ -58,15 +59,18 @@ class TestApp < Minitest::Test
   end
 
   def test_energy_usage
+
     @energy_usage = @a.get('https://mya.dom.com/usage/ViewPastEnergyUsage', @ajax_headers)
     table = @energy_usage.search('table#paymentsTable')
+
     assert table.css('tr > th')[0].text == 'Meter Read Date', 'Past Enenergy Usage Page did not load'
     nodes = @energy_usage.search("*[text() = 'Next Meter Read Date']")
+
     dt = nodes.first.parent.parent.next.next.children[1].css('p').text
     meter_read_date_year = DateTime.parse(dt).year
     assert meter_read_date_year > 2015, 'date was not read'
-  end
 
+  end
 
 end
 

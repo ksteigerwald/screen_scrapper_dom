@@ -3,12 +3,15 @@
 require 'rubygems'
 require 'mechanize'
 require 'highline'
+require './lib/screenie'
+
 # Bill information needed includes:
 #   - usage (kWh),
 #   - bill amount ($),
 #   - service start date,
 #   - and service end date (also sometimes referred to as the meter read dates),
 #   bill due date that can be found under "Analyze Energy Usage"
+
 
 cli = HighLine.new
 user = cli.ask "Dominion Power User Name:" || ENV['DOM_USER']
@@ -34,5 +37,6 @@ a.get('https://mya.dom.com/') do |page|
 
   @profile_page = @a.get('https://mya.dom.com/')
   @billing_page = @a.get('https://mya.dom.com/billing/ViewBilling', ajax_headers)
+  @energy_usage_page = @a.get('https://mya.dom.com/billing/ViewPastEnergyUsage', ajax_headers)
 
 end
